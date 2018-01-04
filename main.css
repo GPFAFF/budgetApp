@@ -18,6 +18,6 @@ section {
   margin: 20px;
 }
 
-.budget_output .expenses, .budget_output .income {
+.budget_output__expenses, .budget_output__income {
   flex: 1;
 }
