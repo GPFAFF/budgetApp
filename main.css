@@ -1,0 +1,23 @@
+body {
+  text-align: center;
+}
+
+section {
+  padding: 20px;
+}
+
+.budget_output {
+  display: flex;
+  justify-content: center;
+}
+
+.budget_income, .budget_expenses {
+  width: 500px;
+  margin: 0 auto;
+  padding: 20px;
+  margin: 20px;
+}
+
+.budget_output .expenses, .budget_output .income {
+  flex: 1;
+}

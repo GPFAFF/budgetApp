@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>BUDGET</title>
+  <link rel="stylesheet" href="main.css">
+</head>
+<body>
+  <div class='container'>
+
+    <section class='hero'>
+      <div class='budget_calculation'>
+        <h1>Available Budget in 2018</h1>
+        <div class="budget_income">Income</div>
+        <div class="budget_expenses">Expenses</div>
+      </div>
+    </section>
+
+    <section class='calculator'>
+      <select class='transaction'>
+        <option value='credit'>+</option>
+        <option value='expense'>-</option>
+      </select>
+
+      <label for='description'></label>
+      <input class='description' value='' type='text' id='description' placeholder='Add Description' />
+
+      <label for='amount'></label>
+      <input class='amount' value='' type='text' id='value' placeholder='$$$$' />
+
+      <button class='calculate' type='submit'>Submit</button>
+    </section>
+
+    <section class='budget_output'>
+      <div class='budget_output income'>
+        Income
+      </div>
+      <div class='budget_output expenses'>
+        Expenses
+      </div>
+    </section>
+  </div>
+  <script src='index.js'></script>
+</body>
+</html>
