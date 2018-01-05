@@ -93,10 +93,10 @@ var UIController = (function() {
 
         } else if (type === 'expenses') {
           const element = document.querySelector('.budget_output__expenses');
-          html = `<div class='expense' id=expense-${object.ID}>
-            <div class='expense__description'>${object.description}</div>
-            <div class='expense__value'>${object.value}</div>
-            <div class='expense__delete_button'>X<button class='item__delete_button'></button>
+          html = `<div class='expenses' id=expense-${object.ID}>
+            <div class='expenses__description'>${object.description}</div>
+            <div class='expenses__value'>${object.value}</div>
+            <div class='expenses__delete_button'>X<button class='item__delete_button'></button>
             </div>
           </div>`
           element.innerHTML += html;

@@ -26,8 +26,8 @@ section {
 .expenses {
   display: flex;
   padding: 10px;
-  border-top: 1px solid #999;
-  border-bottom: 1px solid #999
+  border: 1px solid #999;
+  margin-top: 10px;
 }
 
 .credit__description, .expenses__description {
