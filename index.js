@@ -3,7 +3,7 @@ const description = document.querySelector('.description');
 const amount = document.querySelector('.amount');
 const transaction = document.querySelector('.transaction');
 
-var budgetController = (function() {
+const budgetController = (function() {
   // some code
   const Expense = function(type, description, value) {
     this.type = type;
@@ -36,7 +36,7 @@ var budgetController = (function() {
 
       // Create New ID
       if (data.allItems[type].length > 0) {
-        ID = data.allItems[type][data.allItems[type].length - 1].id + 1;
+        ID = [data.allItems[type].length - 1].id + 1;
       } else {
         ID = 0;
       }
@@ -66,10 +66,9 @@ var UIController = (function() {
 
   return {
     getInputs: function() {
-
       return {
          type: transaction.value,
-         amount: amount.value,
+         amount: Math.round(parseFloat(amount.value)),
          description: description.value
       }
     },
@@ -85,29 +84,35 @@ var UIController = (function() {
         if (type === 'income') {
           element = document.querySelector('.budget_output__income');
           html = `<div class='credit' id=income${object.ID}>
-            <div class='description'>${object.description}</div>
-            <div class='value'>${object.value}</div>
-            <div class='delete_button'><button class='item__delete_button'></button>
+            <div class='credit__description'>${object.description}</div>
+            <div class='credit__value'>${object.value}</div>
+            <div class='credit__delete_button'><button class='item__delete_button'>X</button>
             </div>
           </div>`
-          console.log(html);
-          console.log(element);
           element.innerHTML += html;
 
         } else if (type === 'expenses') {
           const element = document.querySelector('.budget_output__expenses');
-          html = `<div class='credit' id=expense-${object.ID}>
-            <div class='description'>${object.description}</div>
-            <div class='value'>${object.value}</div>
-            <div class='delete_button'><button class='item__delete_button'></button>
+          html = `<div class='expense' id=expense-${object.ID}>
+            <div class='expense__description'>${object.description}</div>
+            <div class='expense__value'>${object.value}</div>
+            <div class='expense__delete_button'>X<button class='item__delete_button'></button>
             </div>
           </div>`
-          console.log(element);
-          console.log(html);
           element.innerHTML += html;
 
         }
+      },
 
+      clearFields: function(...inputs) {
+        let fieldsArray;
+
+        fieldsArray = Array.prototype.slice.call(inputs);
+        fieldsArray.forEach(function(field, index, array) {
+          field.value = '';
+        });
+
+        fieldsArray[0].focus();
       }
 
   }
@@ -116,7 +121,7 @@ var UIController = (function() {
 
 const controller = (function(budgetCtrl, UiCtrl){
 
-  const setupEvents = () => {
+  function setupEvents() {
     calculateButton.addEventListener('click', addItem);
     document.addEventListener('keypress', function () {
       if (event.keyCode === 13) {
@@ -125,36 +130,50 @@ const controller = (function(budgetCtrl, UiCtrl){
     });
   }
 
+  function updateBudget() {
+    // calculate budget
+
+    // Return budget
+
+    // Display UI
+  }
+
   function addItem() {
     event.preventDefault();
     let input;
     let newItem;
 
     input = UiCtrl.getInputs();
-    console.log(input);
     // get input data
 
-    // add item to budget controller
-    newItem = budgetCtrl.addItem(input.type, input.description, input.amount);
-    console.log(newItem);
+    if (input.description !== '' && !isNaN(input.amount) && input.amount >= 0) {
+      // add item to budget controller
+      newItem = budgetCtrl.addItem(input.type, input.description, input.amount);
+      console.log(newItem);
 
-    // add new item to UI
+      // add new item to UI
+      addLineItem = UiCtrl.addListItem(newItem, input.type);
+      clearFields = UiCtrl.clearFields(description, amount);
 
-    addItem = UiCtrl.addListItem(newItem, input.type);
+      // calculate budget
+      updateBudget();
 
-    // calculate budget
+      // display budget
 
-    // display budget
-
-    if (transaction.value === '' || value.value === '' || description.value === '') {
-      alert('error')
+      // if (transaction.value === '' || value.value === '' || description.value === '') {
+      //   alert('error')
+      // }
     }
+
   }
 
   return {
-    init: setupEvents()
-  }
+    init: function() {
+      setupEvents();
+  }}
 
 })(budgetController, UIController);
 
 console.log('loaded');
+
+controller.init();

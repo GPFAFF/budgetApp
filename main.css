@@ -21,3 +21,22 @@ section {
 .budget_output__expenses, .budget_output__income {
   flex: 1;
 }
+
+.credit,
+.expenses {
+  display: flex;
+  padding: 10px;
+  border-top: 1px solid #999;
+  border-bottom: 1px solid #999
+}
+
+.credit__description, .expenses__description {
+  flex: 2;
+}
+
+.credit__value,
+.credit__delete_button,
+.expenses__value,
+.expenses__delete_button {
+  flex: 1;
+}
