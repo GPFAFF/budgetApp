@@ -223,7 +223,28 @@ var UIController = (function () {
         percentageLabel.textContent = '------';
       }
 
-    }
+    },
+
+    displayPercentages: function(percentages) {
+
+      const fields = document.querySelectorAll(percentageLabel);
+
+      const nodeListForEach = function(list, callback) {
+        for (var i = 0; i < list.length; i++) {
+          callback(list[i], i);
+        }
+      }
+
+      nodeListForEach(fields, function(current, index) {
+
+        if (percentages[index] > 0) {
+          current.textContent = `${percentages[index]}%`;
+        } else {
+          current.textContent = '======';
+        }
+      });
+
+    },
 
   }
 
@@ -252,7 +273,9 @@ const controller = (function (budgetCtrl, UiCtrl) {
     budgetCtrl.calculatePercentages();
 
     const percentages = budgetCtrl.getPercentages();
-    console.log(percentages);
+
+    UiCtr.displayPercentages(percentages);
+    console.log("***", percentages);
   }
 
   function addItem() {
@@ -293,8 +316,6 @@ const controller = (function (budgetCtrl, UiCtrl) {
       UiCtrl.deleteListItem(itemID);
 
       updateBudget();
-
-      // updatePercentages();
     }
   }
 
