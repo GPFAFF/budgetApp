@@ -2,6 +2,11 @@ const calculateButton = document.querySelector('.calculate');
 const description = document.querySelector('.description');
 const amount = document.querySelector('.amount');
 const transaction = document.querySelector('.transaction');
+const budget = document.querySelector('.budget');
+const budgetIncome = document.querySelector('.budget_income__income');
+const budgetExpenses = document.querySelector('.budget_expenses__expenses');
+const percentageLabel = document.querySelectorAll('.budget_percentage_label');
+const budgetContainer = document.querySelector('.budget_output');
 
 const budgetController = (function() {
   // some code
@@ -17,6 +22,18 @@ const budgetController = (function() {
     this.value = value;
   }
 
+  function calculateTotal(type) {
+    let sum = 0;
+
+    let loopedArray = data.allItems[type];
+
+    loopedArray.forEach(current => {
+      sum += current.value;
+    });
+
+    data.totals[type] = sum;
+  }
+
   // data structure
   const data = {
     allItems: {
@@ -26,32 +43,65 @@ const budgetController = (function() {
     totals: {
       expenses: 0,
       income: 0,
-    }
+    },
+    budget: 0,
+    percentage: -1
   }
 
   return {
     addItem: function (type, description, value) {
       let newItem;
-      let ID;
+      let Id;
 
+      // console.log('type', data.allItems[type].length);
+      // console.log('description', description);
+      // console.log('value', value);
       // Create New ID
       if (data.allItems[type].length > 0) {
-        ID = [data.allItems[type].length - 1].id + 1;
+        Id = ([data.allItems[type].length])[0]
       } else {
-        ID = 0;
+        Id = 0;
       }
 
+      console.log(Id);
       // Create new item based on type
       if (type === 'expenses') {
-         newItem = new Expense(ID, description, value)
+        newItem = new Expense(Id, description, value)
       } else if (type === 'income') {
-        newItem = new Credit(ID, description, value)
+        newItem = new Credit(Id, description, value)
       }
 
       // push to data
       data.allItems[type].push(newItem);
-
+      console.log(newItem);
       return newItem;
+    },
+
+    calculateBudget: function() {
+
+      // calculate total income and expenses
+      calculateTotal('expenses');
+      calculateTotal('income');
+
+      // calculate budget (income - expenses)
+      data.budget = data.totals.income - data.totals.expenses;
+      console.log(data.budget)
+
+      if (data.totals.income > 0) {
+        // calculate percentage of income spent
+        data.percentage = Math.round((data.totals.expenses / data.totals.income) * 100);
+      } else {
+        data.percentage = -1;
+      }
+    },
+
+    getBudget: function() {
+      return {
+        budget: data.budget,
+        percentage: data.percentage,
+        income: data.totals.income,
+        expenses: data.totals.expenses
+      }
     },
 
     testing: () => {
@@ -76,27 +126,29 @@ var UIController = (function() {
     addListItem: function(object, type) {
 
         let element;
-
+        console.log(object);
         const expenseContainer = document.querySelector('.budget_output expenses');
         const incomeContainer = document.querySelector('.budget_output income')
         // Create HTML STRING with placeholder text
 
         if (type === 'income') {
           element = document.querySelector('.budget_output__income');
-          html = `<div class='credit' id=income${object.ID}>
+          html = `<div class='credit' id=income-${object.type}>
             <div class='credit__description'>${object.description}</div>
             <div class='credit__value'>${object.value}</div>
-            <div class='credit__delete_button'><button class='item__delete_button'>X</button>
+            <div class='credit__delete_button'>
+              <button class='item__delete_button'>X</button>
             </div>
           </div>`
           element.innerHTML += html;
 
         } else if (type === 'expenses') {
           const element = document.querySelector('.budget_output__expenses');
-          html = `<div class='expenses' id=expense-${object.ID}>
+          html = `<div class='expenses' id=expense-${object.type}>
             <div class='expenses__description'>${object.description}</div>
             <div class='expenses__value'>${object.value}</div>
-            <div class='expenses__delete_button'>X<button class='item__delete_button'></button>
+            <div class='expenses__delete_button'>
+              <button class='item__delete_button'>X</button>
             </div>
           </div>`
           element.innerHTML += html;
@@ -113,6 +165,21 @@ var UIController = (function() {
         });
 
         fieldsArray[0].focus();
+      },
+
+      displayBudget: function(object) {
+
+        budget.textContent = object.budget;
+        budgetExpenses.textContent = object.expenses;
+        budgetIncome.textContent = object.income;
+        //percentageLabel
+
+        if (object.percentage > 0) {
+          percentageLabel.textContent = object.percentage;
+        } else {
+          percentageLabel.textContent = '------';
+        }
+
       }
 
   }
@@ -128,14 +195,14 @@ const controller = (function(budgetCtrl, UiCtrl){
         addItem();
       }
     });
+    budgetContainer.addEventListener('click', ctrlDeleteItem);
   }
 
+  // calculate budget
   function updateBudget() {
-    // calculate budget
-
-    // Return budget
-
-    // Display UI
+    budgetCtrl.calculateBudget();
+    var budget = budgetCtrl.getBudget();
+    UiCtrl.displayBudget(budget);
   }
 
   function addItem() {
@@ -149,27 +216,34 @@ const controller = (function(budgetCtrl, UiCtrl){
     if (input.description !== '' && !isNaN(input.amount) && input.amount >= 0) {
       // add item to budget controller
       newItem = budgetCtrl.addItem(input.type, input.description, input.amount);
-      console.log(newItem);
 
       // add new item to UI
       addLineItem = UiCtrl.addListItem(newItem, input.type);
       clearFields = UiCtrl.clearFields(description, amount);
-
-      // calculate budget
       updateBudget();
-
-      // display budget
-
-      // if (transaction.value === '' || value.value === '' || description.value === '') {
-      //   alert('error')
-      // }
     }
 
+  }
+
+  function ctrlDeleteItem(event) {
+    let itemID;
+    itemID = event.target.parentNode.parentNode.id;
+    console.log(itemID);
+
+    if (itemID) {
+
+    }
   }
 
   return {
     init: function() {
       setupEvents();
+      UiCtrl.displayBudget({
+        budget: 0,
+        percentage: 0,
+        expenses: `-------- 0 --------`,
+        income: `-------- 0 --------`
+      })
   }}
 
 })(budgetController, UIController);
