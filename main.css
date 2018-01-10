@@ -14,7 +14,7 @@ section {
 }
 
 .budget_income, .budget_expenses {
-  width: 500px;
+  max-width: 100%;
   text-align: left;
   padding: 20px;
   margin: 20px;
@@ -42,4 +42,16 @@ section {
 .expenses__value,
 .expenses__delete_button {
   flex: 1;
+}
+
+.green {
+  color: greenyellow;
+}
+
+.green:focus {
+  border: 1px solid greenyellow;
+}
+
+.red {
+  color: #FF5049;
 }

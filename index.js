@@ -7,6 +7,7 @@ const budgetIncome = document.querySelector('.budget_income__income');
 const budgetExpenses = document.querySelector('.budget_expenses__expenses');
 const percentageLabel = document.querySelector('.budget__percentage_label');
 const budgetContainer = document.querySelector('.budget_output');
+const dateLabel = document.querySelector('.budget__date_label');
 
 const budgetController = (function () {
   // some code
@@ -87,8 +88,6 @@ const budgetController = (function () {
     deleteItem: function (type, id) {
       let index
       let ids;
-      console.log(type);
-      console.log(id);
 
       ids = data.allItems[type].map(function (item) {
         return item.type;
@@ -110,7 +109,6 @@ const budgetController = (function () {
       data.budget = data.totals.income - data.totals.expenses;
 
       if (data.totals.income > 0) {
-        console.log(data.totals.income);
         // calculate percentage of income spent
         data.percentage = Math.round((data.totals.expenses / data.totals.income) * 100);
       } else {
@@ -123,7 +121,6 @@ const budgetController = (function () {
       const expenses = data.allItems.expenses;
 
       expenses.forEach(function(item) {
-        console.log(item);
         item.calculatePercentage(data.totals.income);
      })
     },
@@ -143,16 +140,18 @@ const budgetController = (function () {
         expenses: data.totals.expenses
       }
     },
-
-    testing: () => {
-      console.log(data);
-    }
   };
 
 })();
 
 var UIController = (function () {
   // some code
+
+  const nodeListForEach = function (list, callback) {
+    for (var i = 0; i < list.length; i++) {
+      callback(list[i], i);
+    }
+  }
 
   return {
     getInputs: function () {
@@ -174,7 +173,7 @@ var UIController = (function () {
         element = document.querySelector('.budget_output__income');
         html = `<div class='credit' id=income-${object.type}>
           <div class='credit__description'>${object.description}</div>
-          <div class='credit__value'>${object.value}</div>
+          <div class='credit__value'>${this.formatNumber(object.value, type)}</div>
           <div class='credit__delete_button'>
             <button class='item__delete_button'>X</button>
           </div>
@@ -185,7 +184,7 @@ var UIController = (function () {
         const element = document.querySelector('.budget_output__expenses');
         html = `<div class='expenses' id=expenses-${object.type}>
           <div class='expenses__description'>${object.description}</div>
-          <div class='expenses__value'>${object.value}</div>
+          <div class='expenses__value'>${this.formatNumber(object.value, type)}</div>
           <div class='expenses__percentage_label'>${object.percentage}</div>
           <div class='expenses__delete_button'>
             <button class='item__delete_button'>X</button>
@@ -213,9 +212,12 @@ var UIController = (function () {
     },
 
     displayBudget: function (object) {
-      budget.textContent = object.budget;
-      budgetExpenses.textContent = object.expenses;
-      budgetIncome.textContent = object.income;
+      let type;
+      object.budget > 0 ? type = 'income' : 'expenses';
+
+      budget.textContent = this.formatNumber(object.budget, type);
+      budgetExpenses.textContent = this.formatNumber(object.expenses, 'expenses');
+      budgetIncome.textContent = this.formatNumber(object.income, 'income');
 
       if (object.percentage > 0) {
         percentageLabel.textContent = object.percentage;
@@ -228,17 +230,7 @@ var UIController = (function () {
     displayPercentages: function(percentages) {
       const expensePercentageLabel = document.querySelectorAll('.expenses__percentage_label');
 
-      var nodeListForEach = function(list, callback) {
-        console.log(list);
-        for (var i = 0; i < list.length; i++) {
-          console.log(list[i]);
-          callback(list[i], i);
-        }
-      }
-
       nodeListForEach(expensePercentageLabel, function(current, index) {
-        console.log(percentages[index]);
-        console.log(current);
         if (percentages[index] > 0) {
           current.textContent = `${percentages[index]}%`;
         } else {
@@ -247,6 +239,45 @@ var UIController = (function () {
       });
 
     },
+
+    displayDate: function() {
+      const currentDate = new Date();
+      const year = currentDate.getFullYear();
+      const month = currentDate.getMonth();
+      const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+
+      dateLabel.textContent = `${months[month]} ${year}:`;
+    },
+
+    inputType: function() {
+
+      const fields = [description, amount, transaction];
+      nodeListForEach(fields, function(current) {
+        current.classList.toggle('red');
+      })
+
+      calculateButton.classList.toggle('red');
+    },
+
+    formatNumber: function(num, type) {
+      num = Math.abs(num);
+      num = num.toFixed(2);
+
+      const numSplit = num.split('.');
+
+      const int = numSplit[0];
+
+      if (int.length > 3) {
+        `${int.substr(0, int.length -1)},${int.substr(int.length -3, int.length)}`;
+      }
+
+      const dec = numSplit[1];
+      return (type === 'expenses' ? '-' : '+') + ' ' + int + '.' + dec;
+
+      //return `(${type} === 'expenses' ? '-' : '+')${int} ${dec}`
+      //return `(${type}` === 'expenses' ? `${sign = '-'}` : `${sign = '+'}` `${int} ${dec}`;
+
+    }
 
   }
 
@@ -262,6 +293,7 @@ const controller = (function (budgetCtrl, UiCtrl) {
       }
     });
     budgetContainer.addEventListener('click', ctrlDeleteItem);
+    document.addEventListener('change', UiCtrl.inputType);
   }
 
   // calculate budget
@@ -335,11 +367,12 @@ const controller = (function (budgetCtrl, UiCtrl) {
   return {
     init: function () {
       setupEvents();
+      UiCtrl.displayDate();
       UiCtrl.displayBudget({
         budget: 0,
         percentage: 0,
-        expenses: `-------- 0 --------`,
-        income: `-------- 0 --------`
+        expenses: 0,
+        income: 0,
       })
     }
   }
