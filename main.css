@@ -7,19 +7,22 @@ section {
 }
 
 .budget_output {
-  display: flex;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: auto;
+  grid-template-rows: 1fr 1fr;
+  grid-gap: 10px;
 }
 
 .budget_income, .budget_expenses {
   width: 500px;
-  margin: 0 auto;
+  text-align: left;
   padding: 20px;
   margin: 20px;
 }
 
 .budget_output__expenses, .budget_output__income {
-  flex: 1;
+  grid-row: 1;
+  grid-gap: 10px;
 }
 
 .credit,
